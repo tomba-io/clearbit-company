@@ -1,0 +1,452 @@
+{
+    "actorSpecification": 1,
+    "fields": {
+        "type": "object",
+        "properties": {
+            "name": {
+                "title": "Company Name",
+                "type": "string",
+                "description": "The name of the company"
+            },
+            "legalName": {
+                "title": "Legal Name",
+                "type": "string",
+                "description": "The legal name of the company"
+            },
+            "domain": {
+                "title": "Domain",
+                "type": "string",
+                "description": "The primary domain name of the company"
+            },
+            "domainAliases": {
+                "title": "Domain Aliases",
+                "type": ["array", "null"],
+                "description": "Alternative domain names for the company",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "site": {
+                "title": "Site Information",
+                "type": "object",
+                "description": "Website contact information",
+                "properties": {
+                    "phoneNumbers": {
+                        "title": "Phone Numbers",
+                        "type": ["array", "null"],
+                        "description": "List of phone numbers found on the website",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "emailAddresses": {
+                        "title": "Email Addresses",
+                        "type": "array",
+                        "description": "List of email addresses found on the website",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "category": {
+                "title": "Industry Classification",
+                "type": "object",
+                "description": "Industry and classification codes",
+                "properties": {
+                    "sector": {
+                        "title": "Sector",
+                        "type": ["string", "null"],
+                        "description": "Industry sector"
+                    },
+                    "industryGroup": {
+                        "title": "Industry Group",
+                        "type": ["string", "null"],
+                        "description": "Industry group classification"
+                    },
+                    "industry": {
+                        "title": "Industry",
+                        "type": ["string", "null"],
+                        "description": "Specific industry"
+                    },
+                    "subIndustry": {
+                        "title": "Sub Industry",
+                        "type": ["string", "null"],
+                        "description": "Sub-industry classification"
+                    },
+                    "sicCode": {
+                        "title": "SIC Code",
+                        "type": ["string", "null"],
+                        "description": "Standard Industrial Classification code"
+                    },
+                    "sic4Codes": {
+                        "title": "4-Digit SIC Codes",
+                        "type": "array",
+                        "description": "4-digit SIC codes",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "naicsCode": {
+                        "title": "NAICS Code",
+                        "type": ["string", "null"],
+                        "description": "North American Industry Classification System code"
+                    },
+                    "naics6Codes": {
+                        "title": "6-Digit NAICS Codes",
+                        "type": "array",
+                        "description": "6-digit NAICS codes",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "naics6Codes2022": {
+                        "title": "6-Digit NAICS Codes (2022)",
+                        "type": "array",
+                        "description": "6-digit NAICS codes for 2022",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "tags": {
+                "title": "Tags",
+                "type": "array",
+                "description": "Industry or business tags",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "description": {
+                "title": "Description",
+                "type": "string",
+                "description": "Company description"
+            },
+            "foundedYear": {
+                "title": "Founded Year",
+                "type": ["string", "null"],
+                "description": "Year the company was founded"
+            },
+            "location": {
+                "title": "Location",
+                "type": ["string", "null"],
+                "description": "Primary location or country code"
+            },
+            "timeZone": {
+                "title": "Time Zone",
+                "type": ["string", "null"],
+                "description": "Company's time zone"
+            },
+            "utcOffset": {
+                "title": "UTC Offset",
+                "type": ["string", "null"],
+                "description": "UTC offset for the company's location"
+            },
+            "geo": {
+                "title": "Geographic Information",
+                "type": "object",
+                "description": "Detailed geographic location information",
+                "properties": {
+                    "streetNumber": {
+                        "title": "Street Number",
+                        "type": ["string", "null"],
+                        "description": "Street number"
+                    },
+                    "streetName": {
+                        "title": "Street Name",
+                        "type": ["string", "null"],
+                        "description": "Street name"
+                    },
+                    "subPremise": {
+                        "title": "Sub Premise",
+                        "type": ["string", "null"],
+                        "description": "Sub premise (apartment, suite, etc.)"
+                    },
+                    "streetAddress": {
+                        "title": "Street Address",
+                        "type": ["string", "null"],
+                        "description": "Full street address"
+                    },
+                    "city": {
+                        "title": "City",
+                        "type": ["string", "null"],
+                        "description": "City name"
+                    },
+                    "postalCode": {
+                        "title": "Postal Code",
+                        "type": ["string", "null"],
+                        "description": "Postal or ZIP code"
+                    },
+                    "state": {
+                        "title": "State",
+                        "type": ["string", "null"],
+                        "description": "State or province name"
+                    },
+                    "stateCode": {
+                        "title": "State Code",
+                        "type": ["string", "null"],
+                        "description": "State or province code"
+                    },
+                    "country": {
+                        "title": "Country",
+                        "type": ["string", "null"],
+                        "description": "Country name"
+                    },
+                    "countryCode": {
+                        "title": "Country Code",
+                        "type": ["string", "null"],
+                        "description": "ISO country code"
+                    },
+                    "lat": {
+                        "title": "Latitude",
+                        "type": ["number", "null"],
+                        "description": "Latitude coordinate"
+                    },
+                    "lng": {
+                        "title": "Longitude",
+                        "type": ["number", "null"],
+                        "description": "Longitude coordinate"
+                    }
+                }
+            },
+            "logo": {
+                "title": "Logo URL",
+                "type": ["string", "null"],
+                "description": "URL to company logo"
+            },
+            "facebook": {
+                "title": "Facebook Information",
+                "type": "object",
+                "description": "Facebook profile information",
+                "properties": {
+                    "handle": {
+                        "title": "Facebook Handle",
+                        "type": ["string", "null"],
+                        "description": "Facebook page handle"
+                    },
+                    "likes": {
+                        "title": "Facebook Likes",
+                        "type": ["number", "null"],
+                        "description": "Number of Facebook likes"
+                    }
+                }
+            },
+            "linkedin": {
+                "title": "LinkedIn Information",
+                "type": "object",
+                "description": "LinkedIn profile information",
+                "properties": {
+                    "handle": {
+                        "title": "LinkedIn Handle",
+                        "type": ["string", "null"],
+                        "description": "LinkedIn company handle"
+                    }
+                }
+            },
+            "twitter": {
+                "title": "Twitter Information",
+                "type": "object",
+                "description": "Twitter profile information",
+                "properties": {
+                    "handle": {
+                        "title": "Twitter Handle",
+                        "type": ["string", "null"],
+                        "description": "Twitter handle"
+                    },
+                    "id": {
+                        "title": "Twitter ID",
+                        "type": ["string", "null"],
+                        "description": "Twitter user ID"
+                    },
+                    "bio": {
+                        "title": "Twitter Bio",
+                        "type": ["string", "null"],
+                        "description": "Twitter bio/description"
+                    },
+                    "followers": {
+                        "title": "Twitter Followers",
+                        "type": ["number", "null"],
+                        "description": "Number of Twitter followers"
+                    },
+                    "following": {
+                        "title": "Twitter Following",
+                        "type": ["number", "null"],
+                        "description": "Number of accounts following"
+                    },
+                    "location": {
+                        "title": "Twitter Location",
+                        "type": ["string", "null"],
+                        "description": "Location from Twitter profile"
+                    },
+                    "site": {
+                        "title": "Twitter Site",
+                        "type": ["string", "null"],
+                        "description": "Website from Twitter profile"
+                    },
+                    "avatar": {
+                        "title": "Twitter Avatar",
+                        "type": ["string", "null"],
+                        "description": "Twitter profile avatar URL"
+                    }
+                }
+            },
+            "whois": {
+                "title": "WHOIS Information",
+                "type": "object",
+                "description": "Domain WHOIS information",
+                "properties": {
+                    "registrar_name": {
+                        "title": "Registrar Name",
+                        "type": ["string", "null"],
+                        "description": "Domain registrar name"
+                    },
+                    "created_date": {
+                        "title": "Created Date",
+                        "type": ["string", "null"],
+                        "description": "Domain creation date"
+                    },
+                    "referral_url": {
+                        "title": "Referral URL",
+                        "type": ["string", "null"],
+                        "description": "Registrar referral URL"
+                    }
+                }
+            },
+            "emailProvider": {
+                "title": "Email Provider",
+                "type": ["string", "null"],
+                "description": "Email service provider used by the company"
+            },
+            "type": {
+                "title": "Company Type",
+                "type": ["string", "null"],
+                "description": "Type of company (e.g., privately held, public)"
+            },
+            "ticker": {
+                "title": "Stock Ticker",
+                "type": ["string", "null"],
+                "description": "Stock ticker symbol (for public companies)"
+            },
+            "identifiers": {
+                "title": "Company Identifiers",
+                "type": "object",
+                "description": "Various company identifiers",
+                "properties": {
+                    "usEIN": {
+                        "title": "US EIN",
+                        "type": ["string", "null"],
+                        "description": "US Employer Identification Number"
+                    }
+                }
+            },
+            "metrics": {
+                "title": "Company Metrics",
+                "type": "object",
+                "description": "Various company metrics and statistics",
+                "properties": {
+                    "alexaUsRank": {
+                        "title": "Alexa US Rank",
+                        "type": ["number", "null"],
+                        "description": "Alexa US traffic rank"
+                    },
+                    "alexaGlobalRank": {
+                        "title": "Alexa Global Rank",
+                        "type": ["number", "null"],
+                        "description": "Alexa global traffic rank"
+                    },
+                    "trafficRank": {
+                        "title": "Traffic Rank",
+                        "type": ["string", "null"],
+                        "description": "Website traffic rank"
+                    },
+                    "employees": {
+                        "title": "Employee Count",
+                        "type": ["string", "null"],
+                        "description": "Number of employees (range)"
+                    },
+                    "marketCap": {
+                        "title": "Market Cap",
+                        "type": ["string", "null"],
+                        "description": "Market capitalization"
+                    },
+                    "raised": {
+                        "title": "Funds Raised",
+                        "type": ["string", "null"],
+                        "description": "Total funds raised"
+                    },
+                    "annualRevenue": {
+                        "title": "Annual Revenue",
+                        "type": ["string", "null"],
+                        "description": "Annual revenue range"
+                    },
+                    "estimatedAnnualRevenue": {
+                        "title": "Estimated Annual Revenue",
+                        "type": ["string", "null"],
+                        "description": "Estimated annual revenue range"
+                    },
+                    "fiscalYearEnd": {
+                        "title": "Fiscal Year End",
+                        "type": ["string", "null"],
+                        "description": "Fiscal year end date"
+                    }
+                }
+            },
+            "indexedAt": {
+                "title": "Indexed At",
+                "type": ["string", "null"],
+                "description": "Date and time when the data was indexed"
+            },
+            "tech": {
+                "title": "Technologies",
+                "type": "array",
+                "description": "Technologies used by the company",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "techCategories": {
+                "title": "Technology Categories",
+                "type": "array",
+                "description": "Categories of technologies used",
+                "items": {
+                    "type": "string"
+                }
+            },
+            "parent": {
+                "title": "Parent Company",
+                "type": "object",
+                "description": "Parent company information",
+                "properties": {
+                    "domain": {
+                        "title": "Parent Domain",
+                        "type": ["string", "null"],
+                        "description": "Domain of parent company"
+                    }
+                }
+            },
+            "ultimateParent": {
+                "title": "Ultimate Parent Company",
+                "type": "object",
+                "description": "Ultimate parent company information",
+                "properties": {
+                    "domain": {
+                        "title": "Ultimate Parent Domain",
+                        "type": ["string", "null"],
+                        "description": "Domain of ultimate parent company"
+                    }
+                }
+            },
+            "source": {
+                "title": "Data Source",
+                "type": "string",
+                "description": "Source of the enrichment data"
+            },
+            "error": {
+                "title": "Error Message",
+                "type": "string",
+                "description": "Error message if enrichment failed"
+            }
+        }
+    }
+}

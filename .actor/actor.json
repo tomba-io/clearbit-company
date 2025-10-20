@@ -1,0 +1,16 @@
+{
+    "actorSpecification": 1,
+    "name": "clearbit-company",
+    "title": "Tomba Clearbit Company",
+    "description": "Enrich company information using the Tomba API.",
+    "version": "0.2",
+    "buildTag": "latest",
+    "meta": {
+        "templateId": "ts-empty"
+    },
+    "dockerfile": "../Dockerfile",
+    "input": "./input_schema.json",
+    "storages": {
+        "dataset": "./dataset_schema.json"
+    }
+}
