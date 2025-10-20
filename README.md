@@ -88,13 +88,6 @@ For each domain, you'll receive:
 
 ### Example Output
 
-````json
-## Output Data Structure
-
-The Actor returns comprehensive company enrichment data for each domain:
-
-### Example Output
-
 ```json
 {
     "name": "Tomba technology web service LLC",
@@ -102,14 +95,7 @@ The Actor returns comprehensive company enrichment data for each domain:
     "domain": "tomba.io",
     "site": {
         "phoneNumbers": ["(850) 790-5575"],
-        "emailAddresses": [
-            "***@tomba.io",
-            "***@tomba.io",
-            "***@tomba.io",
-            "**@tomba.io",
-            "**@tomba.io",
-            "**@tomba.io"
-        ]
+        "emailAddresses": ["***@tomba.io", "***@tomba.io", "***@tomba.io", "**@tomba.io", "**@tomba.io", "**@tomba.io"]
     },
     "category": {
         "sicCode": "73",
@@ -151,15 +137,11 @@ The Actor returns comprehensive company enrichment data for each domain:
         "annualRevenue": "$0-$1M",
         "estimatedAnnualRevenue": "$0-$1M"
     },
-    "tech": [
-        "webpack", "Vue.js", "React", "Nginx", "Express"
-    ],
-    "techCategories": [
-        "JavaScript Libraries", "JavaScript Frameworks", "Web Servers", "Web Frameworks"
-    ],
+    "tech": ["webpack", "Vue.js", "React", "Nginx", "Express"],
+    "techCategories": ["JavaScript Libraries", "JavaScript Frameworks", "Web Servers", "Web Frameworks"],
     "source": "tomba_company_enrichment"
 }
-````
+```
 
 ### Data Structure Overview
 
