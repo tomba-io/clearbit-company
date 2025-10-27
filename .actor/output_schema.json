@@ -1,0 +1,14 @@
+{
+    "actorOutputSchemaVersion": 1,
+    "title": "Clearbit Company Output",
+    "description": "Output from Clearbit Company Actor - comprehensive company information and firmographic data",
+    "type": "object",
+    "properties": {
+        "results": {
+            "type": "string",
+            "title": "Company Information Results",
+            "description": "Detailed company profiles with firmographic and business intelligence data",
+            "template": "{{links.apiDefaultDatasetUrl}}/items"
+        }
+    }
+}
