@@ -203,6 +203,10 @@ The output contains comprehensive company information organized into logical sec
 - [Authentication Guide](https://app.tomba.io/api) - Get your API keys
 - [Pricing & Limits](https://tomba.io/pricing) - Understand rate limits and costs
 
+## Keywords
+
+Clearbit company, company enrichment, firmographic data, business intelligence, company profiles, corporate data, company information, business data enrichment, Clearbit API, company research, B2B data, enterprise data
+
 ## Support
 
 If you need any help, have questions, or encounter any issues while using Tomba.io, please don't hesitate to reach out to our support team. You can contact us via:
