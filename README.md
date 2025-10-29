@@ -203,6 +203,89 @@ The output contains comprehensive company information organized into logical sec
 - [Authentication Guide](https://app.tomba.io/api) - Get your API keys
 - [Pricing & Limits](https://tomba.io/pricing) - Understand rate limits and costs
 
+## FAQ
+
+### General Questions
+
+**Q: What is company enrichment?**
+A: Company enrichment takes a domain name and returns comprehensive business information including company details, location, industry, employee count, revenue, technologies used, and social media profiles.
+
+**Q: What kind of information can I get about companies?**
+A: You get business basics (name, description, industry), location data, employee metrics, revenue estimates, technology stack, social media profiles, and contact information.
+
+**Q: How accurate is the company data?**
+A: Tomba maintains high-quality data with regular updates from multiple sources. Accuracy is typically 90%+ for established companies, though newer companies may have limited information.
+
+### Usage & Features
+
+**Q: Can I enrich any domain?**
+A: You can enrich most business domains. Personal domains (gmail.com) or non-business websites may return limited information. The best results come from established company websites.
+
+**Q: How many companies can I enrich at once?**
+A: You can process up to 1000 domains per run. For optimal performance, process 20-50 domains per batch.
+
+**Q: What if a company doesn't have much public information?**
+A: Newer companies, private organizations, or companies with minimal web presence may return limited data. The service provides whatever information is publicly available.
+
+**Q: Do you provide financial information?**
+A: Yes, when available, including revenue estimates, funding information, employee count ranges, and company growth indicators.
+
+### Technical Questions
+
+**Q: What domain formats should I use?**
+A: Use clean domain names like "stripe.com" or "example.org". Don't include protocols (http/https) or subdomains unless specifically needed.
+
+**Q: What are the rate limits?**
+A: The Actor automatically handles Tomba's rate limits for company enrichment. Large batches are processed with appropriate delays.
+
+**Q: How should I handle missing data?**
+A: Missing fields are normal, especially for newer or smaller companies. Check for null/empty values in your processing logic.
+
+**Q: Can I get historical company data?**
+A: The service provides current company information. For historical tracking, you'd need to run periodic enrichments and store the results over time.
+
+### Business Applications
+
+**Q: How can this help with lead qualification?**
+A: Company size, industry, technology stack, and revenue data help qualify leads, prioritize prospects, and tailor sales approaches based on company characteristics.
+
+**Q: Is this useful for market research?**
+A: Absolutely! Aggregate company data across industries to understand market trends, competitive landscapes, and identify potential opportunities.
+
+**Q: Can I use this for competitive analysis?**
+A: Yes, enrich competitor domains to understand their technology choices, company size, market positioning, and business model indicators.
+
+**Q: How does this help with account-based marketing?**
+A: Detailed company profiles enable personalized marketing approaches, technology-specific messaging, and account segmentation based on company characteristics.
+
+### Data & Privacy
+
+**Q: Where does the company data come from?**
+A: Data is sourced from publicly available information including company websites, business databases, SEC filings, social media, and other legitimate public sources.
+
+**Q: Is this GDPR compliant?**
+A: Yes, company enrichment uses only publicly available business information and complies with privacy regulations.
+
+**Q: How often is company data updated?**
+A: Tomba regularly updates its company database. Update frequency varies by company and data type, with larger companies typically having more frequent updates.
+
+**Q: Can I enrich my customer database?**
+A: Yes, enriching customer domains helps understand your customer base, identify upselling opportunities, and improve customer segmentation.
+
+### Integration & Workflow
+
+**Q: How can I integrate this with my CRM?**
+A: The JSON output can be easily integrated with CRM systems to enrich company records, improve lead scoring, and enhance sales intelligence.
+
+**Q: Should I combine this with other enrichment tools?**
+A: Yes, combining company enrichment with person enrichment (Clearbit Person) provides comprehensive account intelligence for sales and marketing.
+
+**Q: How do I handle large company databases?**
+A: Process companies in batches, implement error handling for failed enrichments, and consider your API quota when planning large-scale enrichment projects.
+
+**Q: Can I automate company enrichment?**
+A: Yes, set up automated workflows to enrich new domains as they enter your systems, keeping your company database current and comprehensive.
+
 ## Keywords
 
 Clearbit company, company enrichment, firmographic data, business intelligence, company profiles, corporate data, company information, business data enrichment, Clearbit API, company research, B2B data, enterprise data
