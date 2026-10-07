@@ -6,12 +6,12 @@
         "properties": {
             "name": {
                 "title": "Company Name",
-                "type": "string",
+                "type": ["string", "null"],
                 "description": "The name of the company"
             },
             "legalName": {
                 "title": "Legal Name",
-                "type": "string",
+                "type": ["string", "null"],
                 "description": "The legal name of the company"
             },
             "domain": {
@@ -29,7 +29,7 @@
             },
             "site": {
                 "title": "Site Information",
-                "type": "object",
+                "type": ["object", "null"],
                 "description": "Website contact information",
                 "properties": {
                     "phoneNumbers": {
@@ -42,7 +42,7 @@
                     },
                     "emailAddresses": {
                         "title": "Email Addresses",
-                        "type": "array",
+                        "type": ["array", "null"],
                         "description": "List of email addresses found on the website",
                         "items": {
                             "type": "string"
@@ -52,7 +52,7 @@
             },
             "category": {
                 "title": "Industry Classification",
-                "type": "object",
+                "type": ["object", "null"],
                 "description": "Industry and classification codes",
                 "properties": {
                     "sector": {
@@ -82,7 +82,7 @@
                     },
                     "sic4Codes": {
                         "title": "4-Digit SIC Codes",
-                        "type": "array",
+                        "type": ["array", "null"],
                         "description": "4-digit SIC codes",
                         "items": {
                             "type": "string"
@@ -95,7 +95,7 @@
                     },
                     "naics6Codes": {
                         "title": "6-Digit NAICS Codes",
-                        "type": "array",
+                        "type": ["array", "null"],
                         "description": "6-digit NAICS codes",
                         "items": {
                             "type": "string"
@@ -103,7 +103,7 @@
                     },
                     "naics6Codes2022": {
                         "title": "6-Digit NAICS Codes (2022)",
-                        "type": "array",
+                        "type": ["array", "null"],
                         "description": "6-digit NAICS codes for 2022",
                         "items": {
                             "type": "string"
@@ -113,7 +113,7 @@
             },
             "tags": {
                 "title": "Tags",
-                "type": "array",
+                "type": ["array", "null"],
                 "description": "Industry or business tags",
                 "items": {
                     "type": "string"
@@ -121,7 +121,7 @@
             },
             "description": {
                 "title": "Description",
-                "type": "string",
+                "type": ["string", "null"],
                 "description": "Company description"
             },
             "foundedYear": {
@@ -146,7 +146,7 @@
             },
             "geo": {
                 "title": "Geographic Information",
-                "type": "object",
+                "type": ["object", "null"],
                 "description": "Detailed geographic location information",
                 "properties": {
                     "streetNumber": {
@@ -218,7 +218,7 @@
             },
             "facebook": {
                 "title": "Facebook Information",
-                "type": "object",
+                "type": ["object", "null"],
                 "description": "Facebook profile information",
                 "properties": {
                     "handle": {
@@ -235,7 +235,7 @@
             },
             "linkedin": {
                 "title": "LinkedIn Information",
-                "type": "object",
+                "type": ["object", "null"],
                 "description": "LinkedIn profile information",
                 "properties": {
                     "handle": {
@@ -247,7 +247,7 @@
             },
             "twitter": {
                 "title": "Twitter Information",
-                "type": "object",
+                "type": ["object", "null"],
                 "description": "Twitter profile information",
                 "properties": {
                     "handle": {
@@ -294,7 +294,7 @@
             },
             "whois": {
                 "title": "WHOIS Information",
-                "type": "object",
+                "type": ["object", "null"],
                 "description": "Domain WHOIS information",
                 "properties": {
                     "registrar_name": {
@@ -331,7 +331,7 @@
             },
             "identifiers": {
                 "title": "Company Identifiers",
-                "type": "object",
+                "type": ["object", "null"],
                 "description": "Various company identifiers",
                 "properties": {
                     "usEIN": {
@@ -343,7 +343,7 @@
             },
             "metrics": {
                 "title": "Company Metrics",
-                "type": "object",
+                "type": ["object", "null"],
                 "description": "Various company metrics and statistics",
                 "properties": {
                     "alexaUsRank": {
@@ -400,7 +400,7 @@
             },
             "tech": {
                 "title": "Technologies",
-                "type": "array",
+                "type": ["array", "null"],
                 "description": "Technologies used by the company",
                 "items": {
                     "type": "string"
@@ -408,7 +408,7 @@
             },
             "techCategories": {
                 "title": "Technology Categories",
-                "type": "array",
+                "type": ["array", "null"],
                 "description": "Categories of technologies used",
                 "items": {
                     "type": "string"
@@ -416,7 +416,7 @@
             },
             "parent": {
                 "title": "Parent Company",
-                "type": "object",
+                "type": ["object", "null"],
                 "description": "Parent company information",
                 "properties": {
                     "domain": {
@@ -428,7 +428,7 @@
             },
             "ultimateParent": {
                 "title": "Ultimate Parent Company",
-                "type": "object",
+                "type": ["object", "null"],
                 "description": "Ultimate parent company information",
                 "properties": {
                     "domain": {
