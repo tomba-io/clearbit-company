@@ -1,0 +1,601 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Tomba Clearbit Company API",
+        "version": "1.0.0",
+        "description": "Real-time API (Apify Standby mode). Enrich domains with company profiles (Clearbit-compatible). Each domain with a company profile found costs $0.00312; domains with no data, errors and cached results are free."
+    },
+    "paths": {
+        "/": {
+            "get": {
+                "summary": "Enrich one or more domains with company data",
+                "description": "Without query parameters, returns a short usage note (also used as the readiness probe).",
+                "parameters": [
+                    {
+                        "name": "domain",
+                        "in": "query",
+                        "description": "Domain to enrich. Repeat the parameter or separate values with commas for several domains. URLs are cleaned up.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "stripe.com"
+                    },
+                    {
+                        "name": "domains",
+                        "in": "query",
+                        "description": "Alias of `domain`.",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "stripe.com,tomba.io"
+                    },
+                    {
+                        "name": "maxResults",
+                        "in": "query",
+                        "description": "Maximum number of domains to enrich (default 50).",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "default": 50
+                        },
+                        "example": 10
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Results"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/Error"
+                    },
+                    "402": {
+                        "$ref": "#/components/responses/Error"
+                    }
+                }
+            },
+            "post": {
+                "summary": "Enrich domains using a JSON input",
+                "description": "Accepts the same JSON input as a normal Actor run.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "domains": {
+                                        "type": "array",
+                                        "description": "Array of domain names to enrich with company information.",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": ["stripe.com", "tomba.io"]
+                                    },
+                                    "maxResults": {
+                                        "type": "integer",
+                                        "description": "Maximum number of companies to enrich. Default is 50.",
+                                        "minimum": 1,
+                                        "maximum": 1000,
+                                        "default": 50
+                                    },
+                                    "maxConcurrency": {
+                                        "type": "integer",
+                                        "description": "How many Tomba requests run in parallel. There is no rate limit, so raise it for large lists.",
+                                        "minimum": 1,
+                                        "maximum": 50,
+                                        "default": 10
+                                    },
+                                    "maxRetries": {
+                                        "type": "integer",
+                                        "description": "How many times to retry a request after a network error, 429 or 5xx response (exponential backoff). Failed requests are never charged.",
+                                        "minimum": 0,
+                                        "maximum": 10,
+                                        "default": 3
+                                    },
+                                    "useCache": {
+                                        "type": "boolean",
+                                        "description": "Reuse results from previous runs for identical requests. Cached results are free.",
+                                        "default": true
+                                    },
+                                    "cacheTtlHours": {
+                                        "type": "integer",
+                                        "description": "How long cached results stay valid. 0 disables the cross-run cache.",
+                                        "minimum": 0,
+                                        "maximum": 720,
+                                        "default": 24
+                                    }
+                                },
+                                "required": ["domains"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/Results"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/Error"
+                    },
+                    "402": {
+                        "$ref": "#/components/responses/Error"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "responses": {
+            "Results": {
+                "description": "Company profiles, one per domain, in the same format as the dataset items.",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "items": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Company"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "Error": {
+                "description": "Invalid input (400) or the run's max charge limit was reached (402).",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "schemas": {
+            "Company": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the company"
+                    },
+                    "legalName": {
+                        "type": "string",
+                        "description": "The legal name of the company"
+                    },
+                    "domain": {
+                        "type": "string",
+                        "description": "Input domain (normalized)"
+                    },
+                    "domainAliases": {
+                        "type": "array",
+                        "nullable": true,
+                        "description": "Alternative domain names for the company",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "site": {
+                        "type": "object",
+                        "description": "Website contact information",
+                        "properties": {
+                            "phoneNumbers": {
+                                "type": "array",
+                                "nullable": true,
+                                "description": "List of phone numbers found on the website",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "emailAddresses": {
+                                "type": "array",
+                                "description": "List of email addresses found on the website",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "category": {
+                        "type": "object",
+                        "description": "Industry and classification codes",
+                        "properties": {
+                            "sector": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Industry sector"
+                            },
+                            "industryGroup": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Industry group classification"
+                            },
+                            "industry": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Specific industry"
+                            },
+                            "subIndustry": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Sub-industry classification"
+                            },
+                            "sicCode": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Standard Industrial Classification code"
+                            },
+                            "sic4Codes": {
+                                "type": "array",
+                                "description": "4-digit SIC codes",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "naicsCode": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "North American Industry Classification System code"
+                            },
+                            "naics6Codes": {
+                                "type": "array",
+                                "description": "6-digit NAICS codes",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "naics6Codes2022": {
+                                "type": "array",
+                                "description": "6-digit NAICS codes for 2022",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "tags": {
+                        "type": "array",
+                        "description": "Industry or business tags",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Company description"
+                    },
+                    "foundedYear": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Year the company was founded"
+                    },
+                    "location": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Primary location or country code"
+                    },
+                    "timeZone": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Company's time zone"
+                    },
+                    "utcOffset": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "UTC offset for the company's location"
+                    },
+                    "geo": {
+                        "type": "object",
+                        "description": "Detailed geographic location information",
+                        "properties": {
+                            "streetNumber": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Street number"
+                            },
+                            "streetName": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Street name"
+                            },
+                            "subPremise": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Sub premise (apartment, suite, etc.)"
+                            },
+                            "streetAddress": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Full street address"
+                            },
+                            "city": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "City name"
+                            },
+                            "postalCode": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Postal or ZIP code"
+                            },
+                            "state": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "State or province name"
+                            },
+                            "stateCode": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "State or province code"
+                            },
+                            "country": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Country name"
+                            },
+                            "countryCode": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "ISO country code"
+                            },
+                            "lat": {
+                                "type": "number",
+                                "nullable": true,
+                                "description": "Latitude coordinate"
+                            },
+                            "lng": {
+                                "type": "number",
+                                "nullable": true,
+                                "description": "Longitude coordinate"
+                            }
+                        }
+                    },
+                    "logo": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "URL to company logo"
+                    },
+                    "facebook": {
+                        "type": "object",
+                        "description": "Facebook profile information",
+                        "properties": {
+                            "handle": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Facebook page handle"
+                            },
+                            "likes": {
+                                "type": "number",
+                                "nullable": true,
+                                "description": "Number of Facebook likes"
+                            }
+                        }
+                    },
+                    "linkedin": {
+                        "type": "object",
+                        "description": "LinkedIn profile information",
+                        "properties": {
+                            "handle": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "LinkedIn company handle"
+                            }
+                        }
+                    },
+                    "twitter": {
+                        "type": "object",
+                        "description": "Twitter profile information",
+                        "properties": {
+                            "handle": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Twitter handle"
+                            },
+                            "id": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Twitter user ID"
+                            },
+                            "bio": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Twitter bio/description"
+                            },
+                            "followers": {
+                                "type": "number",
+                                "nullable": true,
+                                "description": "Number of Twitter followers"
+                            },
+                            "following": {
+                                "type": "number",
+                                "nullable": true,
+                                "description": "Number of accounts following"
+                            },
+                            "location": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Location from Twitter profile"
+                            },
+                            "site": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Website from Twitter profile"
+                            },
+                            "avatar": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Twitter profile avatar URL"
+                            }
+                        }
+                    },
+                    "whois": {
+                        "type": "object",
+                        "description": "Domain WHOIS information",
+                        "properties": {
+                            "registrar_name": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Domain registrar name"
+                            },
+                            "created_date": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Domain creation date"
+                            },
+                            "referral_url": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Registrar referral URL"
+                            }
+                        }
+                    },
+                    "emailProvider": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Email service provider used by the company"
+                    },
+                    "type": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Type of company (e.g., privately held, public)"
+                    },
+                    "ticker": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Stock ticker symbol (for public companies)"
+                    },
+                    "identifiers": {
+                        "type": "object",
+                        "description": "Various company identifiers",
+                        "properties": {
+                            "usEIN": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "US Employer Identification Number"
+                            }
+                        }
+                    },
+                    "metrics": {
+                        "type": "object",
+                        "description": "Various company metrics and statistics",
+                        "properties": {
+                            "alexaUsRank": {
+                                "type": "number",
+                                "nullable": true,
+                                "description": "Alexa US traffic rank"
+                            },
+                            "alexaGlobalRank": {
+                                "type": "number",
+                                "nullable": true,
+                                "description": "Alexa global traffic rank"
+                            },
+                            "trafficRank": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Website traffic rank"
+                            },
+                            "employees": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Number of employees (range)"
+                            },
+                            "marketCap": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Market capitalization"
+                            },
+                            "raised": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Total funds raised"
+                            },
+                            "annualRevenue": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Annual revenue range"
+                            },
+                            "estimatedAnnualRevenue": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Estimated annual revenue range"
+                            },
+                            "fiscalYearEnd": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Fiscal year end date"
+                            }
+                        }
+                    },
+                    "indexedAt": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Date and time when the data was indexed"
+                    },
+                    "tech": {
+                        "type": "array",
+                        "description": "Technologies used by the company",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "techCategories": {
+                        "type": "array",
+                        "description": "Categories of technologies used",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "parent": {
+                        "type": "object",
+                        "description": "Parent company information",
+                        "properties": {
+                            "domain": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Domain of parent company"
+                            }
+                        }
+                    },
+                    "ultimateParent": {
+                        "type": "object",
+                        "description": "Ultimate parent company information",
+                        "properties": {
+                            "domain": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Domain of ultimate parent company"
+                            }
+                        }
+                    },
+                    "source": {
+                        "type": "string"
+                    },
+                    "error": {
+                        "type": "string",
+                        "description": "Why no data was returned"
+                    },
+                    "charged": {
+                        "type": "boolean",
+                        "description": "Whether this result was charged"
+                    },
+                    "cached": {
+                        "type": "boolean",
+                        "description": "Whether this result came from the cache (free)"
+                    }
+                }
+            }
+        }
+    }
+}
