@@ -1,41 +1,79 @@
-## Getting started
+# Development
 
-For complete information [see this article](https://docs.apify.com/platform/actors/development#build-actor-locally). To run the Actor use the following command:
+Notes for maintainers of the Tomba Clearbit Company Actor. The README is the end-user page shown on Apify Store.
+
+## Requirements
+
+- Node.js 20+
+- [Apify CLI](https://docs.apify.com/cli) for deployment
+
+## Scripts
 
 ```bash
-apify run
+npm install
+npm run build     # compile TypeScript to dist/
+npm run lint      # ESLint (src and test)
+npm run format    # Prettier
+npm test          # unit + end-to-end tests (node:test)
+npm start         # run locally with tsx
 ```
 
-## Deploy to Apify
+## Credentials
 
-### Connect Git repository to Apify
+The Actor uses our Tomba account. Credentials come from environment variables, never from the input:
 
-If you've created a Git repository for the project, you can easily connect to Apify:
+| Variable             | Description                                        |
+| -------------------- | -------------------------------------------------- |
+| `TOMBA_API_KEY`      | Tomba API key (`ta_…`)                             |
+| `TOMBA_API_SECRET`   | Tomba secret (`ts_…`)                              |
+| `TOMBA_API_ENDPOINT` | Optional API base URL; only used by the test suite |
 
-1. Go to [Actor creation page](https://console.apify.com/actors/new)
-2. Click on **Link Git Repository** button
+`.actor/actor.json` maps the variables to Apify secrets:
 
-### Push project on your local machine to Apify
+```bash
+apify secrets add tombaApiKey ta_xxxxxxxxxxxxxxxxxxxx
+apify secrets add tombaApiSecret ts_xxxxxxxxxxxxxxxxxxxx
+apify push
+```
 
-You can also deploy the project on your local machine to Apify without the need for the Git repository.
+Run locally (input goes in `storage/key_value_stores/default/INPUT.json`, e.g. `{"domains": ["stripe.com"]}`):
 
-1. Log in to Apify. You will need to provide your [Apify API Token](https://console.apify.com/account/integrations) to complete this action.
+```bash
+TOMBA_API_KEY=ta_… TOMBA_API_SECRET=ts_… npm start
+```
 
-    ```bash
-    apify login
-    ```
+Deploy from Git instead: in Apify Console go to **Actors → Create new → Link Git Repository**, then add the two secrets as environment variables of the Actor.
 
-2. Deploy your Actor. This command will deploy and build the Actor on the Apify Platform. You can find your newly created Actor under [Actors -> My Actors](https://console.apify.com/actors?tab=my).
+## Pricing (pay per event)
 
-    ```bash
-    apify push
-    ```
+In **Apify Console → Publication → Monetization**, choose **Pay per event** and add:
 
-## Documentation reference
+| Event           | Price    | Charged when                                  |
+| --------------- | -------- | --------------------------------------------- |
+| `tomba-request` | $0.00312 | Tomba returns a billable response (see below) |
 
-To learn more about Apify and Actors, take a look at the following resources:
+`isBillable()` in `src/tomba.ts` mirrors Tomba's billing:
 
-- [Apify SDK for JavaScript documentation](https://docs.apify.com/sdk/js)
-- [Apify SDK for Python documentation](https://docs.apify.com/sdk/python)
-- [Apify Platform documentation](https://docs.apify.com/platform)
-- [Join our developer community on Discord](https://discord.com/invite/jyEM2PRvMU)
+| Tomba outcome                                          | Charged |
+| ------------------------------------------------------ | ------- |
+| JSON with non-empty `data`, including negative answers | Yes     |
+| Error status (4xx, 5xx, including 422 and 429)         | No      |
+| Success with empty or null `data`                      | No      |
+| Success with an `errors` object                        | No      |
+| Non-JSON body (reported as 502)                        | No      |
+| Cache hit                                              | No      |
+
+## Architecture
+
+- `src/tomba.ts`: shared helper, identical in every Tomba Actor. It handles credentials, caching (`tomba-cache` key-value store), retries with exponential backoff, pay-per-event charging, budget reservation, the concurrency pool and resume state.
+- `src/main.ts`: reads `domains`, normalizes and deduplicates them, applies `maxResults` (one dataset item per domain), skips domains already in the resume state, then calls `Enrichment.company(domain)` → `GET /companies/find?domain=…` through `callTomba('company', …)`.
+- Output: billable responses are pushed as `{ ...data, domain, source, charged, cached }` with `source: 'tomba_company_enrichment'`; empty or failed lookups are pushed as `{ domain, source, charged: false, cached, error }` (`error` defaults to `No data found`).
+- The `tomba` SDK v1.1.1 resolves every call to `{ data, rateLimit }`, where `data` is the response body. Its `.d.ts` types still declare the old return type, so always go through `callTomba()`.
+
+## Tests
+
+- `test/tomba.test.ts`: unit tests for the shared helper (identical in every Actor)
+- `test/main.test.ts`: end-to-end tests that run `src/main.ts` against a local mock Tomba API
+- `test/helpers.ts`: mock server and Actor runner (identical in every Actor)
+
+Locally, the Apify SDK prices every event at $1 when `ACTOR_TEST_PAY_PER_EVENT=true`, so the tests use `maxTotalChargeUsd` as an event count.

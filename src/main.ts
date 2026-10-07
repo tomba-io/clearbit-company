@@ -1,128 +1,71 @@
-// Apify SDK - toolkit for building Apify Actors (Read more at https://docs.apify.com/sdk/js/)
-import { Actor } from 'apify';
-// Tomba SDK for company enrichment
-import { Enrichment, TombaClient } from 'tomba';
+import { Actor, log } from 'apify';
+import { Enrichment } from 'tomba';
 
-interface ActorInput {
-    tombaApiKey: string;
-    tombaApiSecret: string;
-    domains?: string[];
+import type { RunOptions } from './tomba.js';
+import { callTomba, logSummary, normalizeDomain, runPool, setupTomba, unique, useRunState } from './tomba.js';
+
+interface ActorInput extends RunOptions {
+    domains: string[];
     maxResults?: number;
 }
 
-// Rate limiting: 150 requests per minute
-const RATE_LIMIT = 150;
-const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute in milliseconds
-let requestCount = 0;
-let windowStart = Date.now();
+const SOURCE = 'tomba_company_enrichment';
 
-async function rateLimitedRequest<T>(requestFn: () => Promise<T>): Promise<T> {
-    const now = Date.now();
-
-    // Reset counter if window has passed
-    if (now - windowStart > RATE_LIMIT_WINDOW) {
-        requestCount = 0;
-        windowStart = now;
-    }
-
-    // Check if we've hit the rate limit
-    if (requestCount >= RATE_LIMIT) {
-        const waitTime = RATE_LIMIT_WINDOW - (now - windowStart);
-        console.log(`Rate limit reached. Waiting ${Math.ceil(waitTime / 1000)} seconds...`);
-        await new Promise<void>((resolve) => {
-            setTimeout(() => resolve(), waitTime);
-        });
-
-        // Reset after waiting
-        requestCount = 0;
-        windowStart = Date.now();
-    }
-
-    requestCount++;
-    return await requestFn();
-}
-
-// The init() call configures the Actor for its environment
 await Actor.init();
 
-try {
-    // Get input from the Actor
-    const input = (await Actor.getInput()) as ActorInput;
-
-    if (!input) {
-        throw new Error('No input provided');
-    }
-
-    if (!input.tombaApiKey || !input.tombaApiSecret) {
-        throw new Error('Tomba API key and secret are required');
-    }
-
-    console.log('Starting Tomba Clearbit-Company Actor...');
-    console.log(`Processing ${input.domains?.length || 0} domains`);
-
-    // Initialize Tomba client
-    const client = new TombaClient();
-    const enrichment = new Enrichment(client);
-
-    client.setKey(input.tombaApiKey).setSecret(input.tombaApiSecret);
-
-    const results: Record<string, unknown>[] = [];
-    const maxResults = input.maxResults || 50;
-
-    // Process domains
-    if (input.domains && input.domains.length > 0) {
-        console.log(`Processing ${input.domains.length} domains...`);
-
-        for (const domain of input.domains) {
-            if (results.length >= maxResults) break;
-
-            try {
-                console.log(`Enriching company data for domain: ${domain}`);
-
-                // Use Tomba's company enrichment method with rate limiting
-                const tombaResult = await rateLimitedRequest(async () => enrichment.company(domain));
-
-                if (tombaResult && tombaResult.data) {
-                    const companyData = {
-                        ...tombaResult.data,
-                        domain,
-                        source: 'tomba_company_enrichment',
-                    };
-
-                    results.push(companyData);
-                    console.log(
-                        `Found company data for: ${domain} - ${tombaResult.data.organization || 'Unknown Company'}`,
-                    );
-                }
-            } catch (error) {
-                console.log(`Error processing domain ${domain}:`, error);
-
-                // Add error entry to results for transparency
-                results.push({
-                    domain,
-                    error: error instanceof Error ? error.message : 'Unknown error',
-                    source: 'tomba_company_enrichment',
-                });
-            }
-        }
-    }
-
-    if (results.length > 0) {
-        await Actor.pushData(results);
-    }
-
-    // Log summary
-    console.log('=== SUMMARY ===');
-    console.log(`Total domains processed: ${input.domains?.length || 0}`);
-    console.log(`Successful enrichments: ${results.filter((r) => !('error' in r)).length}`);
-    console.log(`Failed enrichments: ${results.filter((r) => 'error' in r).length}`);
-} catch (error) {
-    console.error('Actor failed:', error);
-    throw error;
+const input = await Actor.getInput<ActorInput>();
+if (!input?.domains?.length) {
+    await Actor.fail('Input must contain at least one domain in "domains".');
 }
 
-// Gracefully exit the Actor process
-await Actor.exit();
+const { domains: rawDomains, maxResults = 50, ...runOptions } = input!;
+const client = await setupTomba(runOptions);
+const enrichment = new Enrichment(client);
+const state = await useRunState();
 
-// Gracefully exit the Actor process. It's recommended to quit all Actors with an exit()
+// Each domain yields one dataset item, so maxResults caps the number of domains processed.
+const domains = unique(rawDomains.map(normalizeDomain)).slice(0, maxResults);
+const pending = domains.filter((domain) => !state.done[domain]);
+if (pending.length < domains.length) {
+    log.info(`Resuming: ${domains.length - pending.length} domains already processed.`);
+}
+
+const startedAt = Date.now();
+log.info(`Enriching company data for ${pending.length} domains`);
+
+await runPool(pending, async (domain) => {
+    const res = await callTomba('company', { domain }, async () => enrichment.company(domain));
+    if (res.skipped) return;
+
+    const data = res.data as Record<string, unknown> | null | undefined;
+    const hasData = !res.error && typeof data === 'object' && data !== null && Object.keys(data).length > 0;
+
+    if (hasData) {
+        await Actor.pushData({
+            ...data,
+            domain,
+            source: SOURCE,
+            charged: res.charged,
+            cached: res.cached,
+        });
+        log.info(
+            `${domain}: found ${String(data.name ?? data.organization ?? 'Unknown Company')}${res.cached ? ' (cached)' : ''}`,
+        );
+    } else {
+        const error = res.error ?? 'No data found';
+        await Actor.pushData({
+            domain,
+            source: SOURCE,
+            charged: res.charged,
+            cached: res.cached,
+            error,
+        });
+        log.info(`${domain}: ${error}`);
+    }
+
+    state.done[domain] = true;
+});
+
+logSummary('Clearbit Company', domains.length, startedAt);
+
 await Actor.exit();
